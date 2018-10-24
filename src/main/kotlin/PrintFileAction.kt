@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.LangDataKeys
 
 class PrintFileAction : AnAction() {
+
     override fun actionPerformed(e: AnActionEvent?) {
         val editor = e?.getData(CommonDataKeys.EDITOR)
         val document = editor?.document
