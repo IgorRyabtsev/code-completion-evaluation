@@ -20,5 +20,4 @@ class SimplePSIVisitor : JavaRecursiveElementVisitor() {
         }
         super.visitMethodCallExpression(expression)
     }
-// убрать ?
 }
