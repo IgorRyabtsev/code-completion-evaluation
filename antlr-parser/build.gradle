@@ -4,7 +4,7 @@ plugins {
     id 'antlr'
 }
 
-group 'completion-evaluation'
+group 'org.jb.cce'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
