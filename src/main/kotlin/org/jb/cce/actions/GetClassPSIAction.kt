@@ -1,10 +1,10 @@
 package org.jb.cce.actions
 
-import org.jb.cce.visitors.SimplePSIVisitor
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.LangDataKeys
+import org.jb.cce.visitors.SimplePSIVisitor
 
 class GetClassPSIAction : AnAction() {
 
