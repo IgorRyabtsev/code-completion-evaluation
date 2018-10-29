@@ -2,6 +2,7 @@ package org.jb.cce
 
 import org.antlr.v4.runtime.BufferedTokenStream
 import org.antlr.v4.runtime.CharStreams
+import org.jb.cce.uast.ClassNode
 
 fun main(args: Array<String>) {
     if (args.size != 1) {
@@ -10,5 +11,6 @@ fun main(args: Array<String>) {
     }
     val lexer = Java8Lexer(CharStreams.fromFileName(args[0]))
     val parser = Java8Parser(BufferedTokenStream(lexer))
-    println(parser.compilationUnit().toStringTree(parser))
+    //println(parser.compilationUnit().toStringTree(parser))
+    JavaVisitor().buildUnifiedAst(parser).print()
 }

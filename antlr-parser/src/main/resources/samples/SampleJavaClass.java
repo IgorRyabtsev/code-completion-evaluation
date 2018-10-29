@@ -1,10 +1,10 @@
-package samples;
-
-import static java.lang.Math.min;
-
-public class SampleJavaClass {
-
-    public static void main(String[] args) {
-        System.out.println(min(3, 4));
+class SampleJavaClass {
+    class InnerClass {
+        int b = a.b.c.d;
+    }
+    int a = b.s.d(e);
+    void main() {
+        int a = b;
+        asd(bsd(ddd, dd, min(a, b)));
     }
 }
