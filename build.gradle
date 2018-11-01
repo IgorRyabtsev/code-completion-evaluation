@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+group 'org.jb.cce'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':antlr-parser')
+    compile project(':interpretator')
+}

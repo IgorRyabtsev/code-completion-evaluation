@@ -1,0 +1,4 @@
+rootProject.name = 'code-completion-evaluation'
+
+include ':antlr-parser'
+include ':interpretator'
