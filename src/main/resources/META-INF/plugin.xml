@@ -20,8 +20,8 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="org.jb.cce.actions.GetClassPsiDataAction" class="org.jb.cce.actions.GetClassPsiDataAction" text="Get information"
-                description="Get information about current file classes">
+        <action id="org.jb.cce.actions.PrintCompletionAction" class="org.jb.cce.actions.PrintCompletionAction" text="Print completion"
+                description="Print completion variants">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
