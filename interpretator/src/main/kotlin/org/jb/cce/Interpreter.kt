@@ -1,3 +1,5 @@
+@file:Suppress("CanSealedSubClassBeObject")
+
 package org.jb.cce
 
 interface CompletionInvoker {
@@ -8,7 +10,7 @@ interface CompletionInvoker {
     fun openFile(file: String)
 }
 
-class Interpretator(private val invoker: CompletionInvoker) {
+class Interpreter(private val invoker: CompletionInvoker) {
 
     fun interpret(actions: List<Action>): List<Session> {
         val result = mutableListOf<Session>()
@@ -27,6 +29,7 @@ class Interpretator(private val invoker: CompletionInvoker) {
                         throw UnexpectedActionException("Session canceled before created")
                     }
                     result.add(currentSession)
+                    currentSession = null
                 }
                 is PrintText -> invoker.printText(action.text)
                 is DeleteRange -> invoker.deleteRange(action.begin, action.end)
@@ -36,18 +39,3 @@ class Interpretator(private val invoker: CompletionInvoker) {
         return result
     }
 }
-
-sealed class Action
-
-data class MoveCaret(val offset: Int) : Action()
-class CallCompletion : Action()
-class CancelSession : Action()
-data class PrintText(val text: String) : Action()
-data class DeleteRange(val begin: Int, val end: Int) : Action()
-data class OpenFile(val file: String) : Action()
-
-class Session {
-    val lookups: MutableList<List<String>> = mutableListOf()
-}
-
-class UnexpectedActionException(message: String) : Exception(message)
