@@ -1,3 +1,5 @@
 package org.jb.cce.uast
 
-interface RValueNode : UnifiedAstNode
+abstract class RValueNode(val text: String,
+                          val offset: Int,
+                          val isArgument: Boolean) : UnifiedAstNode

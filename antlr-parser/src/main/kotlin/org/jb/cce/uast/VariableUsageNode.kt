@@ -1,8 +1,6 @@
 package org.jb.cce.uast
 
-class VariableUsageNode(val name: String) : RValueNode {
-
-    override fun print(indent: String) {
-        kotlin.io.print(indent + name)
-    }
-}
+class VariableUsageNode(val name: String,
+                        text: String,
+                        offset: Int,
+                        isArgument: Boolean) : RValueNode(text, offset, isArgument)
