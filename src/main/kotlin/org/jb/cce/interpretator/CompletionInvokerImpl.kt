@@ -2,6 +2,7 @@ package org.jb.cce.interpretator
 
 import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.openapi.command.WriteCommandAction
@@ -21,19 +22,18 @@ class CompletionInvokerImpl(private val project: Project) : CompletionInvoker {
     }
 
     override fun callCompletion(): List<String> {
-        CodeCompletionHandlerBase(CompletionType.BASIC).invokeCompletion(project, editor) // smart?
-        val lookup = LookupManager.getActiveLookup(editor) as LookupImpl?
-        val resultCompletion = mutableListOf<String>()
-        lookup?.items?.toTypedArray()?.forEach { item -> resultCompletion.add(item.lookupString) }
-        return resultCompletion
+        CodeCompletionHandlerBase(CompletionType.BASIC).invokeCompletion(project, editor)
+        val lookup = LookupManager.getActiveLookup(editor) as LookupImpl
+        return lookup.items.toTypedArray().map(LookupElement::toString).toList();
     }
 
     override fun printText(text: String) {
         val document = editor!!.document
         val project = editor!!.project
-        val runnable = Runnable { document.insertString(editor!!.caretModel.offset, text) }
+        val initialOffset = editor!!.caretModel.offset
+        val runnable = Runnable { document.insertString(initialOffset, text) }
         WriteCommandAction.runWriteCommandAction(project, runnable)
-        editor!!.caretModel.moveToOffset(editor!!.caretModel.offset + text.length)
+        editor!!.caretModel.moveToOffset(initialOffset + text.length)
     }
 
     override fun deleteRange(begin: Int, end: Int) {
