@@ -35,7 +35,7 @@ fun UnifiedAstNode.getAllRValues(list: MutableList<RValueNode> = mutableListOf()
 
 fun generateActions(tree: FileNode): List<Action> {
     val list = mutableListOf<Action>(OpenFile(tree.path))
-    val rvalues = tree.getAllRValues().filter { !it.isArgument }
+    val rvalues = tree.getAllRValues()
     Collections.sort(rvalues, Comparator.comparingInt { it.offset })
     rvalues.asReversed().forEach {
         list.add(DeleteRange(it.offset, it.offset + it.text.length))
@@ -43,19 +43,10 @@ fun generateActions(tree: FileNode): List<Action> {
     rvalues.forEach { rvalue ->
         list.add(MoveCaret(rvalue.offset))
         list.add(CallCompletion())
-        var prevStart = 0
-        if (rvalue is FunctionCallNode) {
-            val arguments = rvalue.getAllRValues()
-            Collections.sort(arguments, kotlin.Comparator.comparingInt { it.offset })
-            arguments.forEach {
-                val nextStart = it.offset - rvalue.offset
-                list.add(PrintText(rvalue.text.substring(prevStart, nextStart)))
-                list.add(CallCompletion())
-                prevStart = nextStart
-            }
-        }
         list.add(CancelSession())
-        list.add(PrintText(rvalue.text.substring(prevStart)))
+        list.add(PrintText(rvalue.text))
     }
+    list.add(CallCompletion())
+    list.add(CancelSession())
     return list
 }

@@ -1,7 +1,7 @@
 package org.jb.cce
 
 import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.misc.Interval
+import org.antlr.v4.runtime.tree.TerminalNode
 import org.jb.cce.uast.*
 
 class JavaVisitor : Java8BaseVisitor<Unit>() {
@@ -49,60 +49,71 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
     }
 
     override fun visitExpressionName(ctx: Java8Parser.ExpressionNameContext) {
-        val parentNode = currentNode
-        currentNode = VariableUsageNode(
-            ctx.text, ctx.text, ctx.start.startIndex, parentNode is FunctionCallNode
-        )
-        ctx.children.forEach { visit(it) }
-        when (parentNode) {
-            is ClassNode -> parentNode.initVariableUsages.add(currentNode as VariableUsageNode)
-            is FunctionNode -> parentNode.variableUsages.add(currentNode as VariableUsageNode)
-            is FunctionCallNode -> parentNode.arguments.add(currentNode as VariableUsageNode)
-            else -> throw UnifiedAstException()
-        }
-        currentNode = parentNode
+        visitVariableUsage(ctx.Identifier(), ctx)
+    }
+
+    override fun visitFieldAccess_lf_primary(ctx: Java8Parser.FieldAccess_lf_primaryContext) {
+        visitVariableUsage(ctx.Identifier(), ctx)
+    }
+
+    override fun visitFieldAccess_lfno_primary(ctx: Java8Parser.FieldAccess_lfno_primaryContext) {
+        visitVariableUsage(ctx.Identifier(), ctx)
     }
 
     override fun visitMethodInvocation(ctx: Java8Parser.MethodInvocationContext) {
-        val parentNode = currentNode
-        val (start, text) = getOriginalText(ctx)
-        currentNode = FunctionCallNode(
-            text.substringBefore('('), text, start, parentNode is FunctionCallNode
-        )
-        ctx.children.forEach { visit(it) }
-        addMethodInvocationToParentNode(parentNode)
-        currentNode = parentNode
+        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx)
     }
 
     override fun visitMethodInvocation_lf_primary(ctx: Java8Parser.MethodInvocation_lf_primaryContext) {
-        ctx.children.forEach { visit(it) }
-        addMethodInvocationToParentNode(currentNode)
+        visitFunctionCall(ctx.Identifier(), ctx)
     }
 
     override fun visitMethodInvocation_lfno_primary(ctx: Java8Parser.MethodInvocation_lfno_primaryContext) {
+        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx)
+    }
+
+    override fun visitClassInstanceCreationExpression(ctx: Java8Parser.ClassInstanceCreationExpressionContext) {
+        visitFunctionCall(ctx.Identifier(0), ctx)
+    }
+
+    override fun visitClassInstanceCreationExpression_lf_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lf_primaryContext) {
+        visitFunctionCall(ctx.Identifier(), ctx)
+    }
+
+    override fun visitClassInstanceCreationExpression_lfno_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lfno_primaryContext) {
+        visitFunctionCall(ctx.Identifier(0), ctx)
+    }
+
+    private fun visitVariableUsage(identifier: TerminalNode, ctx: ParserRuleContext) {
+        val start = identifier.symbol.startIndex
+        val name = identifier.text
         val parentNode = currentNode
-        val (start, text) = getOriginalText(ctx)
-        currentNode = FunctionCallNode(
-            text.substringBefore('('), text, start, parentNode is FunctionCallNode
+        val newCurrentNode = VariableUsageNode(
+            name, name, start, parentNode is FunctionCallNode
         )
         ctx.children.forEach { visit(it) }
-        addMethodInvocationToParentNode(parentNode)
-        currentNode = parentNode
+        when (parentNode) {
+            is ClassNode -> parentNode.initVariableUsages.add(newCurrentNode)
+            is FunctionNode -> parentNode.variableUsages.add(newCurrentNode)
+            is FunctionCallNode -> parentNode.arguments.add(newCurrentNode)
+            else -> throw UnifiedAstException()
+        }
     }
 
-    private fun getOriginalText(ctx: ParserRuleContext): Pair<Int, String> {
-        return Pair(
-            ctx.start.startIndex,
-            ctx.start.inputStream.getText(Interval(ctx.start.startIndex, ctx.stop.stopIndex))
+    private fun visitFunctionCall(identifier: TerminalNode, ctx: ParserRuleContext) {
+        val start = identifier.symbol.startIndex
+        val name = identifier.text
+        val parentNode = currentNode
+        currentNode = FunctionCallNode(
+            name, name, start, parentNode is FunctionCallNode
         )
-    }
-
-    private fun addMethodInvocationToParentNode(parentNode: UnifiedAstNode) {
+        ctx.children.forEach { visit(it) }
         when (parentNode) {
             is ClassNode -> parentNode.initFunctionCalls.add(currentNode as FunctionCallNode)
             is FunctionNode -> parentNode.functionCalls.add(currentNode as FunctionCallNode)
             is FunctionCallNode -> parentNode.arguments.add(currentNode as FunctionCallNode)
             else -> throw UnifiedAstException()
         }
+        currentNode = parentNode
     }
 }

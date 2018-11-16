@@ -1,12 +1,8 @@
 class SampleJavaClass {
-    class InnerClass {
-        int b = a.b.c.d;
-    }
-    int a = b.    s.d(e);
     void main() {
-        foo(bar());
-        asd(d.d.   bsd(ddd, dd, min(a, 123, b)));
-        Object x = f(r);
-        int a = b;
+        aaa = bbb().ccc[ddd].eee.fff();
+        ggg = new hhh(new iii(), jjj[kkk], new ooo());
+        lll(mmm.nnn());
+        ppp[qqq()] = rrr;
     }
 }
