@@ -1,6 +1,7 @@
 package org.jb.cce
 
 import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.misc.Interval
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.jb.cce.uast.*
 
@@ -10,7 +11,9 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
 
     fun buildUnifiedAst(file: String, parser: Java8Parser): FileNode {
         currentNode = FileNode(file)
-        visit(parser.compilationUnit())
+        val cu = parser.compilationUnit()
+        println(cu.toStringTree(parser))
+        visit(cu)
         return currentNode as FileNode
     }
 
@@ -88,9 +91,7 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
         val start = identifier.symbol.startIndex
         val name = identifier.text
         val parentNode = currentNode
-        val newCurrentNode = VariableUsageNode(
-            name, name, start, parentNode is FunctionCallNode
-        )
+        val newCurrentNode = VariableUsageNode("", name, "", start)
         ctx.children.forEach { visit(it) }
         when (parentNode) {
             is ClassNode -> parentNode.initVariableUsages.add(newCurrentNode)
@@ -104,9 +105,8 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
         val start = identifier.symbol.startIndex
         val name = identifier.text
         val parentNode = currentNode
-        currentNode = FunctionCallNode(
-            name, name, start, parentNode is FunctionCallNode
-        )
+        val afterText = identifier.symbol.inputStream.getText(Interval(start + name.length, ctx.stop.stopIndex)).substringBefore("(") + "()"
+        currentNode = FunctionCallNode("", name, afterText, start)
         ctx.children.forEach { visit(it) }
         when (parentNode) {
             is ClassNode -> parentNode.initFunctionCalls.add(currentNode as FunctionCallNode)
