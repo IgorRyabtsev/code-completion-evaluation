@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.intellij' version '0.3.12'
     id 'org.jetbrains.kotlin.jvm' version '1.2.51'
+    id 'antlr'
 }
 
 group 'com.intellij.completion.evaluation'
@@ -12,7 +13,17 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "org.antlr:antlr4-runtime:4.7"
+    antlr "org.antlr:antlr4:4.7"
 }
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ['-package', 'org.jb.cce', '-visitor']
+    outputDirectory = new File("$buildDir/generated-src/antlr/main/org/jb/cce")
+}
+
+compileKotlin.dependsOn generateGrammarSource
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"

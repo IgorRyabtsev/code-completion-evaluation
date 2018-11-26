@@ -22,6 +22,7 @@ class Interpretator(private val invoker: CompletionInvoker) {
                         throw UnexpectedActionException("Session canceled before created")
                     }
                     result.add(currentSession)
+                    currentSession = null
                 }
                 is PrintText -> invoker.printText(action.text)
                 is DeleteRange -> invoker.deleteRange(action.begin, action.end)

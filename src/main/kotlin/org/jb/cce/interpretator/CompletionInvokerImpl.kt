@@ -23,6 +23,9 @@ class CompletionInvokerImpl(private val project: Project) : CompletionInvoker {
 
     override fun callCompletion(): List<String> {
         CodeCompletionHandlerBase(CompletionType.BASIC).invokeCompletion(project, editor)
+        if (LookupManager.getActiveLookup(editor) == null) {
+            return ArrayList()
+        }
         val lookup = LookupManager.getActiveLookup(editor) as LookupImpl
         return lookup.items.toTypedArray().map(LookupElement::toString).toList();
     }
