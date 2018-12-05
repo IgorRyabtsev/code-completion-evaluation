@@ -1,0 +1,411 @@
+[
+  {
+    "file": "/Users/igorryabtsev/work/JetBrainsNewNew/code-completion-evaluation/antlr-parser/src/main/resources/samples/SampleJavaClass.java",
+    "type": "OPEN_FILE"
+  },
+  {
+    "begin": 439,
+    "end": 442,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 433,
+    "end": 436,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 414,
+    "end": 417,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 410,
+    "end": 413,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 406,
+    "end": 409,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 402,
+    "end": 405,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 386,
+    "end": 387,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 362,
+    "end": 365,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 331,
+    "end": 334,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 323,
+    "end": 326,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 307,
+    "end": 310,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 297,
+    "end": 300,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 293,
+    "end": 296,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 286,
+    "end": 289,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 278,
+    "end": 281,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 246,
+    "end": 249,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 242,
+    "end": 245,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 237,
+    "end": 240,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 233,
+    "end": 236,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 227,
+    "end": 230,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "begin": 104,
+    "end": 106,
+    "type": "DELETE_RANGE"
+  },
+  {
+    "offset": 104,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "aa",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 227,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "bbb",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 233,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "ccc",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 237,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "ddd",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 242,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "eee",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 246,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "fff",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 278,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "hhh",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 286,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "iii",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 293,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "jjj",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 297,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "kkk",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 307,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "ooo",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 323,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "lll",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 331,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "nnn",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 362,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "rrr",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 386,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "A",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 402,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "res",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 406,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "ppp",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 410,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "qqq",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 414,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "aaa",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 433,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "res",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "offset": 439,
+    "type": "MOVE_CARET"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  },
+  {
+    "text": "foo",
+    "type": "PRINT_TEXT"
+  },
+  {
+    "type": "CALL_COMPLETION"
+  },
+  {
+    "type": "CANCEL_SESSION"
+  }
+]
