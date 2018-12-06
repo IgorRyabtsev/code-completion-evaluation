@@ -49,47 +49,49 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
     }
 
     override fun visitExpressionName(ctx: Java8Parser.ExpressionNameContext) {
-        visitVariableUsage(ctx.Identifier(), ctx)
+        visitVariableUsage(ctx.Identifier(), ctx, ctx.DOT()?.symbol?.startIndex)
     }
 
     override fun visitFieldAccess_lf_primary(ctx: Java8Parser.FieldAccess_lf_primaryContext) {
-        visitVariableUsage(ctx.Identifier(), ctx)
+        visitVariableUsage(ctx.Identifier(), ctx, ctx.DOT()?.symbol?.startIndex)
     }
 
     override fun visitFieldAccess_lfno_primary(ctx: Java8Parser.FieldAccess_lfno_primaryContext) {
-        visitVariableUsage(ctx.Identifier(), ctx)
+        visitVariableUsage(ctx.Identifier(), ctx, ctx.DOT()?.last()?.symbol?.startIndex)
     }
 
     override fun visitMethodInvocation(ctx: Java8Parser.MethodInvocationContext) {
-        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx)
+        val dotPos = if (ctx.DOT().isNotEmpty()) ctx.DOT().last().symbol.startIndex else null
+        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx, dotPos)
     }
 
     override fun visitMethodInvocation_lf_primary(ctx: Java8Parser.MethodInvocation_lf_primaryContext) {
-        visitFunctionCall(ctx.Identifier(), ctx)
+        visitFunctionCall(ctx.Identifier(), ctx, ctx.DOT()?.symbol?.startIndex)
     }
 
     override fun visitMethodInvocation_lfno_primary(ctx: Java8Parser.MethodInvocation_lfno_primaryContext) {
-        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx)
+        val dotPos = if (ctx.DOT().isNotEmpty()) ctx.DOT().last().symbol.startIndex else null
+        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx, dotPos)
     }
 
     override fun visitClassInstanceCreationExpression(ctx: Java8Parser.ClassInstanceCreationExpressionContext) {
-        visitFunctionCall(ctx.Identifier(0), ctx)
+        visitFunctionCall(ctx.Identifier(0), ctx, null)
     }
 
     override fun visitClassInstanceCreationExpression_lf_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lf_primaryContext) {
-        visitFunctionCall(ctx.Identifier(), ctx)
+        visitFunctionCall(ctx.Identifier(), ctx, null)
     }
 
     override fun visitClassInstanceCreationExpression_lfno_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lfno_primaryContext) {
-        visitFunctionCall(ctx.Identifier(0), ctx)
+        visitFunctionCall(ctx.Identifier(0), ctx, null)
     }
 
-    private fun visitVariableUsage(identifier: TerminalNode, ctx: ParserRuleContext) {
+    private fun visitVariableUsage(identifier: TerminalNode, ctx: ParserRuleContext, dotPos: Int?) {
         val start = identifier.symbol.startIndex
         val name = identifier.text
         val parentNode = currentNode
         val newCurrentNode = VariableUsageNode(
-            name, name, start, parentNode is FunctionCallNode
+                dotPos, name, start, parentNode is FunctionCallNode
         )
         ctx.children.forEach { visit(it) }
         when (parentNode) {
@@ -100,12 +102,12 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
         }
     }
 
-    private fun visitFunctionCall(identifier: TerminalNode, ctx: ParserRuleContext) {
+    private fun visitFunctionCall(identifier: TerminalNode, ctx: ParserRuleContext, dotPos: Int?) {
         val start = identifier.symbol.startIndex
         val name = identifier.text
         val parentNode = currentNode
         currentNode = FunctionCallNode(
-            name, name, start, parentNode is FunctionCallNode
+                dotPos, name, start, parentNode is FunctionCallNode
         )
         ctx.children.forEach { visit(it) }
         when (parentNode) {

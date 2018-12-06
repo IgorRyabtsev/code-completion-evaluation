@@ -1,6 +1,6 @@
 package org.jb.cce.uast
 
-class VariableUsageNode(val name: String,
+class VariableUsageNode(dotPos: Int?,
                         text: String,
                         offset: Int,
-                        isArgument: Boolean) : RValueNode(text, offset, isArgument)
+                        isArgument: Boolean) : RValueNode(dotPos, text, offset, isArgument)

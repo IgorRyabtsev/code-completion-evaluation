@@ -110,11 +110,11 @@ classOrInterfaceType
 
 classType
 	:	annotation* Identifier typeArguments?
-	|	classOrInterfaceType '.' annotation* Identifier typeArguments?
+	|	classOrInterfaceType DOT annotation* Identifier typeArguments?
 	;
 
 classType_lf_classOrInterfaceType
-	:	'.' annotation* Identifier typeArguments?
+	:	DOT annotation* Identifier typeArguments?
 	;
 
 classType_lfno_classOrInterfaceType
@@ -144,7 +144,7 @@ arrayType
 	;
 
 dims
-	:	annotation* '[' ']' (annotation* '[' ']')*
+	:	annotation* LBRACK RBRACK (annotation* LBRACK RBRACK)*
 	;
 
 typeParameter
@@ -169,7 +169,7 @@ typeArguments
 	;
 
 typeArgumentList
-	:	typeArgument (',' typeArgument)*
+	:	typeArgument (COMMA typeArgument)*
 	;
 
 typeArgument
@@ -192,22 +192,22 @@ wildcardBounds
 
 packageName
 	:	Identifier
-	|	packageName '.' Identifier
+	|	packageName DOT Identifier
 	;
 
 typeName
 	:	Identifier
-	|	packageOrTypeName '.' Identifier
+	|	packageOrTypeName DOT Identifier
 	;
 
 packageOrTypeName
 	:	Identifier
-	|	packageOrTypeName '.' Identifier
+	|	packageOrTypeName DOT Identifier
 	;
 
 expressionName
 	:	Identifier
-	|	ambiguousName '.' Identifier
+	|	ambiguousName DOT Identifier
 	;
 
 methodName
@@ -216,7 +216,7 @@ methodName
 
 ambiguousName
 	:	Identifier
-	|	ambiguousName '.' Identifier
+	|	ambiguousName DOT Identifier
 	;
 
 /*
@@ -228,7 +228,7 @@ compilationUnit
 	;
 
 packageDeclaration
-	:	packageModifier* 'package' packageName ';'
+	:	packageModifier* 'package' packageName SEMI
 	;
 
 packageModifier
@@ -243,25 +243,25 @@ importDeclaration
 	;
 
 singleTypeImportDeclaration
-	:	'import' typeName ';'
+	:	'import' typeName SEMI
 	;
 
 typeImportOnDemandDeclaration
-	:	'import' packageOrTypeName '.' '*' ';'
+	:	'import' packageOrTypeName DOT '*' SEMI
 	;
 
 singleStaticImportDeclaration
-	:	'import' 'static' typeName '.' Identifier ';'
+	:	'import' 'static' typeName DOT Identifier SEMI
 	;
 
 staticImportOnDemandDeclaration
-	:	'import' 'static' typeName '.' '*' ';'
+	:	'import' 'static' typeName DOT '*' SEMI
 	;
 
 typeDeclaration
 	:	classDeclaration
 	|	interfaceDeclaration
-	|	';'
+	|	SEMI
 	;
 
 /*
@@ -293,7 +293,7 @@ typeParameters
 	;
 
 typeParameterList
-	:	typeParameter (',' typeParameter)*
+	:	typeParameter (COMMA typeParameter)*
 	;
 
 superclass
@@ -305,11 +305,11 @@ superinterfaces
 	;
 
 interfaceTypeList
-	:	interfaceType (',' interfaceType)*
+	:	interfaceType (COMMA interfaceType)*
 	;
 
 classBody
-	:	'{' classBodyDeclaration* '}'
+	:	LBRACE classBodyDeclaration* RBRACE
 	;
 
 classBodyDeclaration
@@ -324,11 +324,11 @@ classMemberDeclaration
 	|	methodDeclaration
 	|	classDeclaration
 	|	interfaceDeclaration
-	|	';'
+	|	SEMI
 	;
 
 fieldDeclaration
-	:	fieldModifier* unannType variableDeclaratorList ';'
+	:	fieldModifier* unannType variableDeclaratorList SEMI
 	;
 
 fieldModifier
@@ -343,7 +343,7 @@ fieldModifier
 	;
 
 variableDeclaratorList
-	:	variableDeclarator (',' variableDeclarator)*
+	:	variableDeclarator (COMMA variableDeclarator)*
 	;
 
 variableDeclarator
@@ -386,11 +386,11 @@ unannClassOrInterfaceType
 
 unannClassType
 	:	Identifier typeArguments?
-	|	unannClassOrInterfaceType '.' annotation* Identifier typeArguments?
+	|	unannClassOrInterfaceType DOT annotation* Identifier typeArguments?
 	;
 
 unannClassType_lf_unannClassOrInterfaceType
-	:	'.' annotation* Identifier typeArguments?
+	:	DOT annotation* Identifier typeArguments?
 	;
 
 unannClassType_lfno_unannClassOrInterfaceType
@@ -447,18 +447,18 @@ result
 	;
 
 methodDeclarator
-	:	Identifier '(' formalParameterList? ')' dims?
+	:	Identifier LPAREN formalParameterList? RPAREN dims?
 	;
 
 formalParameterList
 	:	receiverParameter
-	|	formalParameters ',' lastFormalParameter
+	|	formalParameters COMMA lastFormalParameter
 	|	lastFormalParameter
 	;
 
 formalParameters
-	:	formalParameter (',' formalParameter)*
-	|	receiverParameter (',' formalParameter)*
+	:	formalParameter (COMMA formalParameter)*
+	|	receiverParameter (COMMA formalParameter)*
 	;
 
 formalParameter
@@ -476,7 +476,7 @@ lastFormalParameter
 	;
 
 receiverParameter
-	:	annotation* unannType (Identifier '.')? 'this'
+	:	annotation* unannType (Identifier DOT)? 'this'
 	;
 
 throws_
@@ -484,7 +484,7 @@ throws_
 	;
 
 exceptionTypeList
-	:	exceptionType (',' exceptionType)*
+	:	exceptionType (COMMA exceptionType)*
 	;
 
 exceptionType
@@ -494,7 +494,7 @@ exceptionType
 
 methodBody
 	:	block
-	|	';'
+	|	SEMI
 	;
 
 instanceInitializer
@@ -517,7 +517,7 @@ constructorModifier
 	;
 
 constructorDeclarator
-	:	typeParameters? simpleTypeName '(' formalParameterList? ')'
+	:	typeParameters? simpleTypeName LPAREN formalParameterList? RPAREN
 	;
 
 simpleTypeName
@@ -525,14 +525,14 @@ simpleTypeName
 	;
 
 constructorBody
-	:	'{' explicitConstructorInvocation? blockStatements? '}'
+	:	LBRACE explicitConstructorInvocation? blockStatements? RBRACE
 	;
 
 explicitConstructorInvocation
-	:	typeArguments? 'this' '(' argumentList? ')' ';'
-	|	typeArguments? 'super' '(' argumentList? ')' ';'
-	|	expressionName '.' typeArguments? 'super' '(' argumentList? ')' ';'
-	|	primary '.' typeArguments? 'super' '(' argumentList? ')' ';'
+	:	typeArguments? 'this' LPAREN argumentList? RPAREN SEMI
+	|	typeArguments? 'super' LPAREN argumentList? RPAREN SEMI
+	|	expressionName DOT typeArguments? 'super' LPAREN argumentList? RPAREN SEMI
+	|	primary DOT typeArguments? 'super' LPAREN argumentList? RPAREN SEMI
 	;
 
 enumDeclaration
@@ -540,15 +540,15 @@ enumDeclaration
 	;
 
 enumBody
-	:	'{' enumConstantList? ','? enumBodyDeclarations? '}'
+	:	LBRACE enumConstantList? COMMA? enumBodyDeclarations? RBRACE
 	;
 
 enumConstantList
-	:	enumConstant (',' enumConstant)*
+	:	enumConstant (COMMA enumConstant)*
 	;
 
 enumConstant
-	:	enumConstantModifier* Identifier ('(' argumentList? ')')? classBody?
+	:	enumConstantModifier* Identifier (LPAREN argumentList? RPAREN)? classBody?
 	;
 
 enumConstantModifier
@@ -556,7 +556,7 @@ enumConstantModifier
 	;
 
 enumBodyDeclarations
-	:	';' classBodyDeclaration*
+	:	SEMI classBodyDeclaration*
 	;
 
 /*
@@ -587,7 +587,7 @@ extendsInterfaces
 	;
 
 interfaceBody
-	:	'{' interfaceMemberDeclaration* '}'
+	:	LBRACE interfaceMemberDeclaration* RBRACE
 	;
 
 interfaceMemberDeclaration
@@ -595,11 +595,11 @@ interfaceMemberDeclaration
 	|	interfaceMethodDeclaration
 	|	classDeclaration
 	|	interfaceDeclaration
-	|	';'
+	|	SEMI
 	;
 
 constantDeclaration
-	:	constantModifier* unannType variableDeclaratorList ';'
+	:	constantModifier* unannType variableDeclaratorList SEMI
 	;
 
 constantModifier
@@ -627,7 +627,7 @@ annotationTypeDeclaration
 	;
 
 annotationTypeBody
-	:	'{' annotationTypeMemberDeclaration* '}'
+	:	LBRACE annotationTypeMemberDeclaration* RBRACE
 	;
 
 annotationTypeMemberDeclaration
@@ -635,11 +635,11 @@ annotationTypeMemberDeclaration
 	|	constantDeclaration
 	|	classDeclaration
 	|	interfaceDeclaration
-	|	';'
+	|	SEMI
 	;
 
 annotationTypeElementDeclaration
-	:	annotationTypeElementModifier* unannType Identifier '(' ')' dims? defaultValue? ';'
+	:	annotationTypeElementModifier* unannType Identifier LPAREN RPAREN dims? defaultValue? SEMI
 	;
 
 annotationTypeElementModifier
@@ -659,11 +659,11 @@ annotation
 	;
 
 normalAnnotation
-	:	'@' typeName '(' elementValuePairList? ')'
+	:	'@' typeName LPAREN elementValuePairList? RPAREN
 	;
 
 elementValuePairList
-	:	elementValuePair (',' elementValuePair)*
+	:	elementValuePair (COMMA elementValuePair)*
 	;
 
 elementValuePair
@@ -677,11 +677,11 @@ elementValue
 	;
 
 elementValueArrayInitializer
-	:	'{' elementValueList? ','? '}'
+	:	LBRACE elementValueList? COMMA? RBRACE
 	;
 
 elementValueList
-	:	elementValue (',' elementValue)*
+	:	elementValue (COMMA elementValue)*
 	;
 
 markerAnnotation
@@ -689,7 +689,7 @@ markerAnnotation
 	;
 
 singleElementAnnotation
-	:	'@' typeName '(' elementValue ')'
+	:	'@' typeName LPAREN elementValue RPAREN
 	;
 
 /*
@@ -697,11 +697,11 @@ singleElementAnnotation
  */
 
 arrayInitializer
-	:	'{' variableInitializerList? ','? '}'
+	:	LBRACE variableInitializerList? COMMA? RBRACE
 	;
 
 variableInitializerList
-	:	variableInitializer (',' variableInitializer)*
+	:	variableInitializer (COMMA variableInitializer)*
 	;
 
 /*
@@ -709,7 +709,7 @@ variableInitializerList
  */
 
 block
-	:	'{' blockStatements? '}'
+	:	LBRACE blockStatements? RBRACE
 	;
 
 blockStatements
@@ -723,7 +723,7 @@ blockStatement
 	;
 
 localVariableDeclarationStatement
-	:	localVariableDeclaration ';'
+	:	localVariableDeclaration SEMI
 	;
 
 localVariableDeclaration
@@ -763,7 +763,7 @@ statementWithoutTrailingSubstatement
 	;
 
 emptyStatement
-	:	';'
+	:	SEMI
 	;
 
 labeledStatement
@@ -775,7 +775,7 @@ labeledStatementNoShortIf
 	;
 
 expressionStatement
-	:	statementExpression ';'
+	:	statementExpression SEMI
 	;
 
 statementExpression
@@ -789,28 +789,28 @@ statementExpression
 	;
 
 ifThenStatement
-	:	'if' '(' expression ')' statement
+	:	'if' LPAREN expression RPAREN statement
 	;
 
 ifThenElseStatement
-	:	'if' '(' expression ')' statementNoShortIf 'else' statement
+	:	'if' LPAREN expression RPAREN statementNoShortIf 'else' statement
 	;
 
 ifThenElseStatementNoShortIf
-	:	'if' '(' expression ')' statementNoShortIf 'else' statementNoShortIf
+	:	'if' LPAREN expression RPAREN statementNoShortIf 'else' statementNoShortIf
 	;
 
 assertStatement
-	:	'assert' expression ';'
-	|	'assert' expression ':' expression ';'
+	:	'assert' expression SEMI
+	|	'assert' expression ':' expression SEMI
 	;
 
 switchStatement
-	:	'switch' '(' expression ')' switchBlock
+	:	'switch' LPAREN expression RPAREN switchBlock
 	;
 
 switchBlock
-	:	'{' switchBlockStatementGroup* switchLabel* '}'
+	:	LBRACE switchBlockStatementGroup* switchLabel* RBRACE
 	;
 
 switchBlockStatementGroup
@@ -832,15 +832,15 @@ enumConstantName
 	;
 
 whileStatement
-	:	'while' '(' expression ')' statement
+	:	'while' LPAREN expression RPAREN statement
 	;
 
 whileStatementNoShortIf
-	:	'while' '(' expression ')' statementNoShortIf
+	:	'while' LPAREN expression RPAREN statementNoShortIf
 	;
 
 doStatement
-	:	'do' statement 'while' '(' expression ')' ';'
+	:	'do' statement 'while' LPAREN expression RPAREN SEMI
 	;
 
 forStatement
@@ -854,11 +854,11 @@ forStatementNoShortIf
 	;
 
 basicForStatement
-	:	'for' '(' forInit? ';' expression? ';' forUpdate? ')' statement
+	:	'for' LPAREN forInit? SEMI expression? SEMI forUpdate? RPAREN statement
 	;
 
 basicForStatementNoShortIf
-	:	'for' '(' forInit? ';' expression? ';' forUpdate? ')' statementNoShortIf
+	:	'for' LPAREN forInit? SEMI expression? SEMI forUpdate? RPAREN statementNoShortIf
 	;
 
 forInit
@@ -871,35 +871,35 @@ forUpdate
 	;
 
 statementExpressionList
-	:	statementExpression (',' statementExpression)*
+	:	statementExpression (COMMA statementExpression)*
 	;
 
 enhancedForStatement
-	:	'for' '(' variableModifier* unannType variableDeclaratorId ':' expression ')' statement
+	:	'for' LPAREN variableModifier* unannType variableDeclaratorId ':' expression RPAREN statement
 	;
 
 enhancedForStatementNoShortIf
-	:	'for' '(' variableModifier* unannType variableDeclaratorId ':' expression ')' statementNoShortIf
+	:	'for' LPAREN variableModifier* unannType variableDeclaratorId ':' expression RPAREN statementNoShortIf
 	;
 
 breakStatement
-	:	'break' Identifier? ';'
+	:	'break' Identifier? SEMI
 	;
 
 continueStatement
-	:	'continue' Identifier? ';'
+	:	'continue' Identifier? SEMI
 	;
 
 returnStatement
-	:	'return' expression? ';'
+	:	'return' expression? SEMI
 	;
 
 throwStatement
-	:	'throw' expression ';'
+	:	'throw' expression SEMI
 	;
 
 synchronizedStatement
-	:	'synchronized' '(' expression ')' block
+	:	'synchronized' LPAREN expression RPAREN block
 	;
 
 tryStatement
@@ -913,7 +913,7 @@ catches
 	;
 
 catchClause
-	:	'catch' '(' catchFormalParameter ')' block
+	:	'catch' LPAREN catchFormalParameter RPAREN block
 	;
 
 catchFormalParameter
@@ -933,11 +933,11 @@ tryWithResourcesStatement
 	;
 
 resourceSpecification
-	:	'(' resourceList ';'? ')'
+	:	LPAREN resourceList SEMI? RPAREN
 	;
 
 resourceList
-	:	resource (';' resource)*
+	:	resource (SEMI resource)*
 	;
 
 resource
@@ -958,11 +958,11 @@ primary
 
 primaryNoNewArray
 	:	literal
-	|	typeName ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'
+	|	typeName (LBRACK RBRACK)* DOT 'class'
+	|	'void' DOT 'class'
 	|	'this'
-	|	typeName '.' 'this'
-	|	'(' expression ')'
+	|	typeName DOT 'this'
+	|	LPAREN expression RPAREN
 	|	classInstanceCreationExpression
 	|	fieldAccess
 	|	arrayAccess
@@ -976,11 +976,11 @@ primaryNoNewArray_lf_arrayAccess
 
 primaryNoNewArray_lfno_arrayAccess
 	:	literal
-	|	typeName ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'
+	|	typeName (LBRACK RBRACK)* DOT 'class'
+	|	'void' DOT 'class'
 	|	'this'
-	|	typeName '.' 'this'
-	|	'(' expression ')'
+	|	typeName DOT 'this'
+	|	LPAREN expression RPAREN
 	|	classInstanceCreationExpression
 	|	fieldAccess
 	|	methodInvocation
@@ -1008,12 +1008,12 @@ primaryNoNewArray_lf_primary_lfno_arrayAccess_lf_primary
 
 primaryNoNewArray_lfno_primary
 	:	literal
-	|	typeName ('[' ']')* '.' 'class'
-	|	unannPrimitiveType ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'
+	|	typeName (LBRACK RBRACK)* DOT 'class'
+	|	unannPrimitiveType (LBRACK RBRACK)* DOT 'class'
+	|	'void' DOT 'class'
 	|	'this'
-	|	typeName '.' 'this'
-	|	'(' expression ')'
+	|	typeName DOT 'this'
+	|	LPAREN expression RPAREN
 	|	classInstanceCreationExpression_lfno_primary
 	|	fieldAccess_lfno_primary
 	|	arrayAccess_lfno_primary
@@ -1027,12 +1027,12 @@ primaryNoNewArray_lfno_primary_lf_arrayAccess_lfno_primary
 
 primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary
 	:	literal
-	|	typeName ('[' ']')* '.' 'class'
-	|	unannPrimitiveType ('[' ']')* '.' 'class'
-	|	'void' '.' 'class'
+	|	typeName (LBRACK RBRACK)* DOT 'class'
+	|	unannPrimitiveType (LBRACK RBRACK)* DOT 'class'
+	|	'void' DOT 'class'
 	|	'this'
-	|	typeName '.' 'this'
-	|	'(' expression ')'
+	|	typeName DOT 'this'
+	|	LPAREN expression RPAREN
 	|	classInstanceCreationExpression_lfno_primary
 	|	fieldAccess_lfno_primary
 	|	methodInvocation_lfno_primary
@@ -1040,18 +1040,18 @@ primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary
 	;
 
 classInstanceCreationExpression
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	primary '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	NEW typeArguments? annotation* Identifier (DOT annotation* Identifier)* typeArgumentsOrDiamond? LPAREN argumentList? RPAREN classBody?
+	|	expressionName DOT NEW typeArguments? annotation* Identifier typeArgumentsOrDiamond? LPAREN argumentList? RPAREN classBody?
+	|	primary DOT NEW typeArguments? annotation* Identifier typeArgumentsOrDiamond? LPAREN argumentList? RPAREN classBody?
 	;
 
 classInstanceCreationExpression_lf_primary
-	:	'.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	DOT NEW typeArguments? annotation* Identifier typeArgumentsOrDiamond? LPAREN argumentList? RPAREN classBody?
 	;
 
 classInstanceCreationExpression_lfno_primary
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	NEW typeArguments? annotation* Identifier (DOT annotation* Identifier)* typeArgumentsOrDiamond? LPAREN argumentList? RPAREN classBody?
+	|	expressionName DOT NEW typeArguments? annotation* Identifier typeArgumentsOrDiamond? LPAREN argumentList? RPAREN classBody?
 	;
 
 typeArgumentsOrDiamond
@@ -1060,66 +1060,66 @@ typeArgumentsOrDiamond
 	;
 
 fieldAccess
-	:	primary '.' Identifier
-	|	'super' '.' Identifier
-	|	typeName '.' 'super' '.' Identifier
+	:	primary DOT Identifier
+	|	'super' DOT Identifier
+	|	typeName DOT 'super' DOT Identifier
 	;
 
 fieldAccess_lf_primary
-	:	'.' Identifier
+	:	DOT Identifier
 	;
 
 fieldAccess_lfno_primary
-	:	'super' '.' Identifier
-	|	typeName '.' 'super' '.' Identifier
+	:	'super' DOT Identifier
+	|	typeName DOT 'super' DOT Identifier
 	;
 
 arrayAccess
-	:	(	expressionName '[' expression ']'
-		|	primaryNoNewArray_lfno_arrayAccess '[' expression ']'
+	:	(	expressionName LBRACK expression RBRACK
+		|	primaryNoNewArray_lfno_arrayAccess LBRACK expression RBRACK
 		)
-		(	primaryNoNewArray_lf_arrayAccess '[' expression ']'
+		(	primaryNoNewArray_lf_arrayAccess LBRACK expression RBRACK
 		)*
 	;
 
 arrayAccess_lf_primary
-	:	(	primaryNoNewArray_lf_primary_lfno_arrayAccess_lf_primary '[' expression ']'
+	:	(	primaryNoNewArray_lf_primary_lfno_arrayAccess_lf_primary LBRACK expression RBRACK
 		)
-		(	primaryNoNewArray_lf_primary_lf_arrayAccess_lf_primary '[' expression ']'
+		(	primaryNoNewArray_lf_primary_lf_arrayAccess_lf_primary LBRACK expression RBRACK
 		)*
 	;
 
 arrayAccess_lfno_primary
-	:	(	expressionName '[' expression ']'
-		|	primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary '[' expression ']'
+	:	(	expressionName LBRACK expression RBRACK
+		|	primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary LBRACK expression RBRACK
 		)
-		(	primaryNoNewArray_lfno_primary_lf_arrayAccess_lfno_primary '[' expression ']'
+		(	primaryNoNewArray_lfno_primary_lf_arrayAccess_lfno_primary LBRACK expression RBRACK
 		)*
 	;
 
 methodInvocation
-	:	methodName '(' argumentList? ')'
-	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	primary '.' typeArguments? Identifier '(' argumentList? ')'
-	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'
-	|	typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+	:	methodName LPAREN argumentList? RPAREN
+	|	typeName DOT typeArguments? Identifier LPAREN argumentList? RPAREN
+	|	expressionName DOT typeArguments? Identifier LPAREN argumentList? RPAREN
+	|	primary DOT typeArguments? Identifier LPAREN argumentList? RPAREN
+	|	'super' DOT typeArguments? Identifier LPAREN argumentList? RPAREN
+	|	typeName DOT 'super' DOT typeArguments? Identifier LPAREN argumentList? RPAREN
 	;
 
 methodInvocation_lf_primary
-	:	'.' typeArguments? Identifier '(' argumentList? ')'
+	:	DOT typeArguments? Identifier LPAREN argumentList? RPAREN
 	;
 
 methodInvocation_lfno_primary
-	:	methodName '(' argumentList? ')'
-	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'
-	|	typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+	:	methodName LPAREN argumentList? RPAREN
+	|	typeName DOT typeArguments? Identifier LPAREN argumentList? RPAREN
+	|	expressionName DOT typeArguments? Identifier LPAREN argumentList? RPAREN
+	|	'super' DOT typeArguments? Identifier LPAREN argumentList? RPAREN
+	|	typeName DOT 'super' DOT typeArguments? Identifier LPAREN argumentList? RPAREN
 	;
 
 argumentList
-	:	expression (',' expression)*
+	:	expression (COMMA expression)*
 	;
 
 methodReference
@@ -1127,9 +1127,9 @@ methodReference
 	|	referenceType '::' typeArguments? Identifier
 	|	primary '::' typeArguments? Identifier
 	|	'super' '::' typeArguments? Identifier
-	|	typeName '.' 'super' '::' typeArguments? Identifier
-	|	classType '::' typeArguments? 'new'
-	|	arrayType '::' 'new'
+	|	typeName DOT 'super' '::' typeArguments? Identifier
+	|	classType '::' typeArguments? NEW
+	|	arrayType '::' NEW
 	;
 
 methodReference_lf_primary
@@ -1140,16 +1140,16 @@ methodReference_lfno_primary
 	:	expressionName '::' typeArguments? Identifier
 	|	referenceType '::' typeArguments? Identifier
 	|	'super' '::' typeArguments? Identifier
-	|	typeName '.' 'super' '::' typeArguments? Identifier
-	|	classType '::' typeArguments? 'new'
-	|	arrayType '::' 'new'
+	|	typeName DOT 'super' '::' typeArguments? Identifier
+	|	classType '::' typeArguments? NEW
+	|	arrayType '::' NEW
 	;
 
 arrayCreationExpression
-	:	'new' primitiveType dimExprs dims?
-	|	'new' classOrInterfaceType dimExprs dims?
-	|	'new' primitiveType dims arrayInitializer
-	|	'new' classOrInterfaceType dims arrayInitializer
+	:	NEW primitiveType dimExprs dims?
+	|	NEW classOrInterfaceType dimExprs dims?
+	|	NEW primitiveType dims arrayInitializer
+	|	NEW classOrInterfaceType dims arrayInitializer
 	;
 
 dimExprs
@@ -1157,7 +1157,7 @@ dimExprs
 	;
 
 dimExpr
-	:	annotation* '[' expression ']'
+	:	annotation* LBRACK expression RBRACK
 	;
 
 constantExpression
@@ -1175,12 +1175,12 @@ lambdaExpression
 
 lambdaParameters
 	:	Identifier
-	|	'(' formalParameterList? ')'
-	|	'(' inferredFormalParameterList ')'
+	|	LPAREN formalParameterList? RPAREN
+	|	LPAREN inferredFormalParameterList RPAREN
 	;
 
 inferredFormalParameterList
-	:	Identifier (',' Identifier)*
+	:	Identifier (COMMA Identifier)*
 	;
 
 lambdaBody
@@ -1332,9 +1332,9 @@ postDecrementExpression_lf_postfixExpression
 	;
 
 castExpression
-	:	'(' primitiveType ')' unaryExpression
-	|	'(' referenceType additionalBound* ')' unaryExpressionNotPlusMinus
-	|	'(' referenceType additionalBound* ')' lambdaExpression
+	:	LPAREN primitiveType RPAREN unaryExpression
+	|	LPAREN referenceType additionalBound* RPAREN unaryExpressionNotPlusMinus
+	|	LPAREN referenceType additionalBound* RPAREN lambdaExpression
 	;
 
 // LEXER
@@ -1551,8 +1551,8 @@ FloatingPointLiteral
 
 fragment
 DecimalFloatingPointLiteral
-	:	Digits '.' Digits? ExponentPart? FloatTypeSuffix?
-	|	'.' Digits ExponentPart? FloatTypeSuffix?
+	:	Digits DOT Digits? ExponentPart? FloatTypeSuffix?
+	|	DOT Digits ExponentPart? FloatTypeSuffix?
 	|	Digits ExponentPart FloatTypeSuffix?
 	|	Digits FloatTypeSuffix
 	;
@@ -1589,8 +1589,8 @@ HexadecimalFloatingPointLiteral
 
 fragment
 HexSignificand
-	:	HexNumeral '.'?
-	|	'0' [xX] HexDigits? '.' HexDigits
+	:	HexNumeral DOT?
+	|	'0' [xX] HexDigits? DOT HexDigits
 	;
 
 fragment

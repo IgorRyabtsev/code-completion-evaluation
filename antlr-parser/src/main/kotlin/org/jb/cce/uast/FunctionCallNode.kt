@@ -1,9 +1,9 @@
 package org.jb.cce.uast
 
-class FunctionCallNode(val name: String,
+class FunctionCallNode(dotPos: Int?,
                        text: String,
                        offset: Int,
-                       isArgument: Boolean) : RValueNode(text, offset, isArgument) {
+                       isArgument: Boolean) : RValueNode(dotPos, text, offset, isArgument) {
 
     val arguments = mutableListOf<RValueNode>()
 }

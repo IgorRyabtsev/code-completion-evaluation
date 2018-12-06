@@ -38,13 +38,18 @@ fun generateActions(tree: FileNode): List<Action> {
     val rvalues = tree.getAllRValues()
     Collections.sort(rvalues, Comparator.comparingInt { it.offset })
     rvalues.asReversed().forEach {
-        list.add(DeleteRange(it.offset, it.offset + it.text.length))
+        list.add(DeleteRange(it.offset, it.offset + it.name.length))
+        it.dotPos?.let { pos -> list.add(DeleteRange(pos, pos + 1)) }
     }
-    rvalues.forEach { rvalue ->
-        list.add(MoveCaret(rvalue.offset))
+    rvalues.forEach {
+        it.dotPos?.let { pos ->
+            list.add(MoveCaret(pos))
+            list.add(PrintText("."))
+        }
+        list.add(MoveCaret(it.offset))
         list.add(CallCompletion())
         list.add(CancelSession())
-        list.add(PrintText(rvalue.text))
+        list.add(PrintText(it.name))
     }
     list.add(CallCompletion())
     list.add(CancelSession())
