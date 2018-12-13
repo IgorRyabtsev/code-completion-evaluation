@@ -1,6 +1,8 @@
 package org.jb.cce.uast
 
-class VariableUsageNode(dotPos: Int?,
+import org.jb.cce.CallWithBracketsNode
+
+class VariableUsageNode(brackets: BracketsNode?,
+                        dotOrNew: DotOrNewNode?,
                         text: String,
-                        offset: Int,
-                        isArgument: Boolean) : RValueNode(dotPos, text, offset, isArgument)
+                        offset: Int) : CallWithBracketsNode(brackets, dotOrNew, text, offset)

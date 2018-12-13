@@ -1119,7 +1119,8 @@ methodInvocation_lfno_primary
 	;
 
 argumentList
-	:	expression (COMMA expression)*
+	:	expression
+	|   expression COMMA argumentList
 	;
 
 methodReference

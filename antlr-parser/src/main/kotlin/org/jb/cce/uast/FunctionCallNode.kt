@@ -1,9 +1,8 @@
 package org.jb.cce.uast
 
-class FunctionCallNode(dotPos: Int?,
-                       text: String,
-                       offset: Int,
-                       isArgument: Boolean) : RValueNode(dotPos, text, offset, isArgument) {
+import org.jb.cce.CallWithBracketsNode
 
-    val arguments = mutableListOf<RValueNode>()
-}
+class FunctionCallNode(brackets: BracketsNode?,
+                        dotOrNew: DotOrNewNode?,
+                        text: String,
+                        offset: Int) : CallWithBracketsNode(brackets, dotOrNew, text, offset)

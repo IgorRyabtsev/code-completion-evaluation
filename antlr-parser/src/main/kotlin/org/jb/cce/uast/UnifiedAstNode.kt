@@ -40,7 +40,7 @@ private object UnifiedAstNodePrinter {
 
     fun printFunctionCallNode(indent: String, node: FunctionCallNode) {
         kotlin.io.print("$indent${node.name}(")
-        for (argument in node.arguments) {
+        for (argument in node.getArguments()) {
             argument.accept(" ")
         }
         kotlin.io.print(" )")
