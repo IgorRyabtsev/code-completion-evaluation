@@ -52,4 +52,10 @@ class CompletionInvokerImpl(private val project: Project) : CompletionInvoker {
         val fileEditor = FileEditorManager.getInstance(project).openFile(virtualFile!!, false)[0]
         editor = (fileEditor as TextEditor).editor
     }
+
+    override fun closeFile(file: String) {
+        val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(file))
+        FileEditorManager.getInstance(project).closeFile(virtualFile!!)
+        editor = null
+    }
 }

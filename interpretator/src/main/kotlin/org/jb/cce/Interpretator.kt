@@ -9,6 +9,7 @@ class Interpretator(private val invoker: CompletionInvoker) {
     fun interpret(actions: List<Action>): List<Session> {
         val result = mutableListOf<Session>()
         var currentSession: Session? = null
+        var currentOpenedFile = ""
         for (action in actions) {
             when (action) {
                 is MoveCaret -> invoker.moveCaret(action.offset)
@@ -28,7 +29,13 @@ class Interpretator(private val invoker: CompletionInvoker) {
                 }
                 is PrintText -> invoker.printText(action.text)
                 is DeleteRange -> invoker.deleteRange(action.begin, action.end)
-                is OpenFile -> invoker.openFile(action.file)
+                is OpenFile -> {
+                    if (!currentOpenedFile.isEmpty()) {
+                        invoker.closeFile(currentOpenedFile)
+                    }
+                    invoker.openFile(action.file)
+                    currentOpenedFile = action.file
+                }
             }
         }
         return result

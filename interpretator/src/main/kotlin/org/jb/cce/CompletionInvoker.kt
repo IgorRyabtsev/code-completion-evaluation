@@ -6,4 +6,5 @@ interface CompletionInvoker {
     fun printText(text: String)
     fun deleteRange(begin: Int, end: Int)
     fun openFile(file: String)
+    fun closeFile(file: String)
 }
