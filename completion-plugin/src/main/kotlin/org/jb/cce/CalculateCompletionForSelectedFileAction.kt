@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.jb.cce.actions.generateActions
 import org.jb.cce.interpretator.CompletionInvokerImpl
 
-class PrintCompletionAction : AnAction() {
+class CalculateCompletionForSelectedFileAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent?) {
 
@@ -28,7 +28,7 @@ class PrintCompletionAction : AnAction() {
 
         val generatedActions = generateActions(tree)
         val completions = interpretator.interpret(generatedActions)
-
+        println("Completion quality evaluation for selected file")
         println("Precision Metric value = " + PrecisionMetricsEvaluator.evaluate(completions))
         println("Recall Metric value = " + RecallMetricsEvaluator.evaluate(completions))
         println("FMeasure Metric value = " + FMeasureMetricsEvaluator.evaluate(completions))
