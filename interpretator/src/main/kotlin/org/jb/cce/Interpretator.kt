@@ -1,7 +1,5 @@
-package org.jb.cce.interpretator
+package org.jb.cce
 
-import org.jb.cce.CompletionInvoker
-import org.jb.cce.Session
 import org.jb.cce.actions.*
 import org.jb.cce.exception.UnexpectedActionException
 
@@ -18,6 +16,7 @@ class Interpretator(private val invoker: CompletionInvoker) {
                     if (currentSession == null) {
                         currentSession = Session()
                     }
+                    currentSession.completions.add(action.text)
                     currentSession.lookups.add(invoker.callCompletion())
                 }
                 is CancelSession -> {

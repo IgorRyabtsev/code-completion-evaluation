@@ -20,8 +20,8 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="org.jb.cce.PrintCompletionAction" class="org.jb.cce.PrintCompletionAction" text="Print completion"
-                description="Print completion variants">
+        <action id="org.jb.cce.PrintCompletionAction" class="org.jb.cce.PrintCompletionAction" text="Calculate metrics"
+                description="Calculate metrics">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>

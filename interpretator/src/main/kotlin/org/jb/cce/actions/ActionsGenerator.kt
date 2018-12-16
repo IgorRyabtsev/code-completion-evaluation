@@ -42,11 +42,9 @@ fun generateActions(tree: FileNode): List<Action> {
     }
     rvalues.forEach { rvalue ->
         list.add(MoveCaret(rvalue.offset))
-        list.add(CallCompletion())
+        list.add(CallCompletion(rvalue.text))
         list.add(CancelSession())
         list.add(PrintText(rvalue.text))
     }
-    list.add(CallCompletion())
-    list.add(CancelSession())
     return list
 }

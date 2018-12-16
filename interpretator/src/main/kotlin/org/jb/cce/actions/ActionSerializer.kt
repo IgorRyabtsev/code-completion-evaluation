@@ -17,7 +17,7 @@ class ActionSerializer {
     private fun deserialize(action: Map<String, Any>): Action {
         return when (action["type"]) {
             Action.ActionType.MOVE_CARET.name -> MoveCaret((action["offset"] as Double).toInt())
-            Action.ActionType.CALL_COMPLETION.name -> CallCompletion()
+            Action.ActionType.CALL_COMPLETION.name -> CallCompletion(action["text"] as String)
             Action.ActionType.CANCEL_SESSION.name -> CancelSession()
             Action.ActionType.PRINT_TEXT.name -> PrintText(action["text"] as String)
             Action.ActionType.DELETE_RANGE.name ->

@@ -7,10 +7,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import org.antlr.v4.runtime.BufferedTokenStream
 import org.antlr.v4.runtime.CharStreams
 import org.jb.cce.actions.generateActions
-import org.jb.cce.completion.CompletionEvaluator
 import org.jb.cce.interpretator.CompletionInvokerImpl
-import org.jb.cce.interpretator.Interpretator
-import java.util.*
 
 class PrintCompletionAction : AnAction() {
 
@@ -32,10 +29,8 @@ class PrintCompletionAction : AnAction() {
         val generatedActions = generateActions(tree)
         val completions = interpretator.interpret(generatedActions)
 
-        val evaluator = CompletionEvaluator(generatedActions, completions)
-        println(evaluator.getPrecisionMetric())
-        println(evaluator.getRecallMetric())
-        println(evaluator.getFMeasureMetric())
-        print(FMeasureMetricsEvaluator.evaluate(Collections.emptyList()))
+        println("Precision Metric value = " + PrecisionMetricsEvaluator.evaluate(completions))
+        println("Recall Metric value = " + RecallMetricsEvaluator.evaluate(completions))
+        println("FMeasure Metric value = " + FMeasureMetricsEvaluator.evaluate(completions))
     }
 }
