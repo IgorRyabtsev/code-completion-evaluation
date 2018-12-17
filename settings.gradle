@@ -1,3 +1,3 @@
-rootProject.name = 'completion-evaluation-plugin'
+rootProject.name = 'completion-evaluation'
 
 include 'antlr-parser', 'completion-plugin', 'interpretator', 'metrics-evaluator'
