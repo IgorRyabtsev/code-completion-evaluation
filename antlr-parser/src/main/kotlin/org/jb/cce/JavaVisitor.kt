@@ -1,119 +1,199 @@
 package org.jb.cce
 
 import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.tree.TerminalNode
 import org.jb.cce.uast.*
+import org.jb.cce.uast.statements.declarations.*
+import org.jb.cce.uast.statements.declarations.blocks.ClassInitializerNode
+import org.jb.cce.uast.statements.declarations.blocks.MethodBodyNode
+import org.jb.cce.uast.statements.expressions.references.FunctionCallNode
+import org.jb.cce.uast.statements.expressions.references.VariableAccessNode
 
 class JavaVisitor : Java8BaseVisitor<Unit>() {
 
-    private var currentNode: UnifiedAstNode = FileNode("")
+    private lateinit var currentNode: UnifiedAstNode
 
-    fun buildUnifiedAst(file: String, parser: Java8Parser): FileNode {
-        currentNode = FileNode(file)
+    fun buildUnifiedAst(parser: Java8Parser): FileNode {
         visit(parser.compilationUnit())
         return currentNode as FileNode
     }
 
+    override fun visitCompilationUnit(ctx: Java8Parser.CompilationUnitContext) {
+        currentNode = FileNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+    }
+
     override fun visitNormalClassDeclaration(ctx: Java8Parser.NormalClassDeclarationContext) {
         val parentNode = currentNode
-        currentNode = ClassNode(ctx.Identifier().text)
-        ctx.children.forEach { visit(it) }
+        currentNode = ClassDeclarationNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
         when (parentNode) {
-            is FileNode -> parentNode.classes.add(currentNode as ClassNode)
-            is ClassNode -> parentNode.subclasses.add(currentNode as ClassNode)
-            else -> throw UnifiedAstException()
+            is FileNode -> parentNode.addDeclaration(currentNode as ClassDeclarationNode)
+            is ClassDeclarationNode -> parentNode.addMember(currentNode as ClassDeclarationNode)
+            is BlockNode -> parentNode.addStatement(currentNode as ClassDeclarationNode)
         }
         currentNode = parentNode
     }
 
-    override fun visitConstructorDeclaration(ctx: Java8Parser.ConstructorDeclarationContext) {
+    override fun visitNormalInterfaceDeclaration(ctx: Java8Parser.NormalInterfaceDeclarationContext) {
         val parentNode = currentNode
-        currentNode = FunctionNode()
-        ctx.children.forEach { visit(it) }
+        currentNode = ClassDeclarationNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
         when (parentNode) {
-            is ClassNode -> parentNode.methods.add(currentNode as FunctionNode)
-            else -> throw UnifiedAstException()
+            is FileNode -> parentNode.addDeclaration(currentNode as ClassDeclarationNode)
+            is ClassDeclarationNode -> parentNode.addMember(currentNode as ClassDeclarationNode)
+            is BlockNode -> parentNode.addStatement(currentNode as ClassDeclarationNode)
+        }
+        currentNode = parentNode
+    }
+
+    override fun visitInstanceInitializer(ctx: Java8Parser.InstanceInitializerContext) {
+        val parentNode = currentNode as ClassDeclarationNode
+        currentNode = ClassInitializerNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.addMember(currentNode as ClassInitializerNode)
+        currentNode = parentNode
+    }
+
+    override fun visitStaticInitializer(ctx: Java8Parser.StaticInitializerContext) {
+        val parentNode = currentNode as ClassDeclarationNode
+        currentNode = ClassInitializerNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.addMember(currentNode as ClassInitializerNode)
+        currentNode = parentNode
+    }
+
+    override fun visitVariableDeclarator(ctx: Java8Parser.VariableDeclaratorContext) {
+        val parentNode = currentNode
+        currentNode = if (ctx.variableDeclaratorId().dims() != null) {
+            ArrayDeclarationNode(ctx.variableDeclaratorId().Identifier().text, getOffset(ctx), getLength(ctx))
+        } else {
+            VariableDeclarationNode(ctx.variableDeclaratorId().Identifier().text, getOffset(ctx), getLength(ctx))
+        }
+        visitChildren(ctx)
+        when (parentNode) {
+            is ClassDeclarationNode -> parentNode.addMember(currentNode as VariableDeclarationNode)
+            is BlockNode -> parentNode.addStatement(currentNode as VariableDeclarationNode)
         }
         currentNode = parentNode
     }
 
     override fun visitMethodDeclaration(ctx: Java8Parser.MethodDeclarationContext) {
-        val parentNode = currentNode
-        currentNode = FunctionNode(ctx.methodHeader().methodDeclarator().Identifier().text)
-        ctx.children.forEach { visit(it) }
-        when (parentNode) {
-            is ClassNode -> parentNode.methods.add(currentNode as FunctionNode)
-            else -> throw UnifiedAstException()
+        val parentNode = currentNode as ClassDeclarationNode
+        currentNode = MethodDeclarationNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.addMember(currentNode as MethodDeclarationNode)
+        currentNode = parentNode
+    }
+
+    override fun visitConstructorDeclaration(ctx: Java8Parser.ConstructorDeclarationContext) {
+        val parentNode = currentNode as ClassDeclarationNode
+        currentNode = MethodDeclarationNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.addMember(currentNode as ClassInitializerNode)
+        currentNode = parentNode
+    }
+
+    override fun visitInterfaceMethodDeclaration(ctx: Java8Parser.InterfaceMethodDeclarationContext) {
+        val parentNode = currentNode as ClassDeclarationNode
+        currentNode = MethodDeclarationNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.addMember(currentNode as ClassInitializerNode)
+        currentNode = parentNode
+    }
+
+    override fun visitMethodDeclarator(ctx: Java8Parser.MethodDeclaratorContext) {
+        val parentNode = currentNode as MethodDeclarationNode
+        currentNode = MethodHeaderNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.setHeader(currentNode as MethodHeaderNode)
+        currentNode = parentNode
+    }
+
+    override fun visitConstructorDeclarator(ctx: Java8Parser.ConstructorDeclaratorContext) {
+        val parentNode = currentNode as MethodDeclarationNode
+        currentNode = MethodHeaderNode(ctx.simpleTypeName().Identifier().text, getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.setHeader(currentNode as MethodHeaderNode)
+        currentNode = parentNode
+    }
+
+    override fun visitFormalParameter(ctx: Java8Parser.FormalParameterContext) {
+        val childNode = VariableDeclarationNode(ctx.variableDeclaratorId().Identifier().text, getOffset(ctx), getLength(ctx))
+        (currentNode as MethodHeaderNode).addArgument(childNode)
+    }
+
+    override fun visitLastFormalParameter(ctx: Java8Parser.LastFormalParameterContext) {
+        if (ctx.formalParameter() != null) {
+            visit(ctx.formalParameter())
+            return
         }
+        val childNode = VariableDeclarationNode(ctx.variableDeclaratorId().Identifier().text, getOffset(ctx), getLength(ctx))
+        (currentNode as MethodHeaderNode).addArgument(childNode)
+    }
+
+    override fun visitMethodBody(ctx: Java8Parser.MethodBodyContext) {
+        val parentNode = currentNode as MethodDeclarationNode
+        currentNode = MethodBodyNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.setBody(currentNode as MethodBodyNode)
+        currentNode = parentNode
+    }
+
+    override fun visitConstructorBody(ctx: Java8Parser.ConstructorBodyContext) {
+        val parentNode = currentNode as MethodDeclarationNode
+        currentNode = MethodBodyNode(getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        parentNode.setBody(currentNode as MethodBodyNode)
         currentNode = parentNode
     }
 
     override fun visitExpressionName(ctx: Java8Parser.ExpressionNameContext) {
-        visitVariableUsage(ctx.Identifier(), ctx)
+        val childNode = VariableAccessNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        (currentNode as BlockNode).addStatement(childNode)
     }
 
-    override fun visitFieldAccess_lf_primary(ctx: Java8Parser.FieldAccess_lf_primaryContext) {
-        visitVariableUsage(ctx.Identifier(), ctx)
-    }
-
-    override fun visitFieldAccess_lfno_primary(ctx: Java8Parser.FieldAccess_lfno_primaryContext) {
-        visitVariableUsage(ctx.Identifier(), ctx)
+    override fun visitFieldAccess(ctx: Java8Parser.FieldAccessContext) {
+        val childNode = VariableAccessNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        (currentNode as BlockNode).addStatement(childNode)
     }
 
     override fun visitMethodInvocation(ctx: Java8Parser.MethodInvocationContext) {
-        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx)
-    }
-
-    override fun visitMethodInvocation_lf_primary(ctx: Java8Parser.MethodInvocation_lf_primaryContext) {
-        visitFunctionCall(ctx.Identifier(), ctx)
-    }
-
-    override fun visitMethodInvocation_lfno_primary(ctx: Java8Parser.MethodInvocation_lfno_primaryContext) {
-        visitFunctionCall(ctx.Identifier() ?: ctx.methodName().Identifier(), ctx)
-    }
-
-    override fun visitClassInstanceCreationExpression(ctx: Java8Parser.ClassInstanceCreationExpressionContext) {
-        visitFunctionCall(ctx.Identifier(0), ctx)
-    }
-
-    override fun visitClassInstanceCreationExpression_lf_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lf_primaryContext) {
-        visitFunctionCall(ctx.Identifier(), ctx)
-    }
-
-    override fun visitClassInstanceCreationExpression_lfno_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lfno_primaryContext) {
-        visitFunctionCall(ctx.Identifier(0), ctx)
-    }
-
-    private fun visitVariableUsage(identifier: TerminalNode, ctx: ParserRuleContext) {
-        val start = identifier.symbol.startIndex
-        val name = identifier.text
+        ctx.expressionName()?.let { visit(it) }
+        ctx.primary()?.let { visit(it) }
         val parentNode = currentNode
-        val newCurrentNode = VariableUsageNode(
-            name, name, start, parentNode is FunctionCallNode
-        )
-        ctx.children.forEach { visit(it) }
+        currentNode = FunctionCallNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        ctx.argumentList()?.let { visit(it) }
         when (parentNode) {
-            is ClassNode -> parentNode.initVariableUsages.add(newCurrentNode)
-            is FunctionNode -> parentNode.variableUsages.add(newCurrentNode)
-            is FunctionCallNode -> parentNode.arguments.add(newCurrentNode)
-            else -> throw UnifiedAstException()
-        }
-    }
-
-    private fun visitFunctionCall(identifier: TerminalNode, ctx: ParserRuleContext) {
-        val start = identifier.symbol.startIndex
-        val name = identifier.text
-        val parentNode = currentNode
-        currentNode = FunctionCallNode(
-            name, name, start, parentNode is FunctionCallNode
-        )
-        ctx.children.forEach { visit(it) }
-        when (parentNode) {
-            is ClassNode -> parentNode.initFunctionCalls.add(currentNode as FunctionCallNode)
-            is FunctionNode -> parentNode.functionCalls.add(currentNode as FunctionCallNode)
-            is FunctionCallNode -> parentNode.arguments.add(currentNode as FunctionCallNode)
-            else -> throw UnifiedAstException()
+            is BlockNode -> parentNode.addStatement(currentNode as FunctionCallNode)
+            is FunctionCallNode -> parentNode.addArgument(currentNode as FunctionCallNode)
         }
         currentNode = parentNode
     }
+
+    override fun visitMethodInvocation_lf_primary(ctx: Java8Parser.MethodInvocation_lf_primaryContext) {
+        val parentNode = currentNode
+        currentNode = FunctionCallNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        ctx.argumentList()?.let { visit(it) }
+        when (parentNode) {
+            is BlockNode -> parentNode.addStatement(currentNode as FunctionCallNode)
+            is FunctionCallNode -> parentNode.addArgument(currentNode as FunctionCallNode)
+        }
+        currentNode = parentNode
+    }
+
+    override fun visitMethodInvocation_lfno_primary(ctx: Java8Parser.MethodInvocation_lfno_primaryContext) {
+        ctx.expressionName()?.let { visit(it) }
+        val parentNode = currentNode
+        currentNode = FunctionCallNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        ctx.argumentList()?.let { visit(it) }
+        when (parentNode) {
+            is BlockNode -> parentNode.addStatement(currentNode as FunctionCallNode)
+            is FunctionCallNode -> parentNode.addArgument(currentNode as FunctionCallNode)
+        }
+        currentNode = parentNode
+    }
+
+    private fun getOffset(ctx: ParserRuleContext) = ctx.start.startIndex
+
+    private fun getLength(ctx: ParserRuleContext) = ctx.stop.stopIndex - ctx.start.startIndex + 1
 }

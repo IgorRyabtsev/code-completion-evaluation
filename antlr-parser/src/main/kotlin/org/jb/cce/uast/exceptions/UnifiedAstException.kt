@@ -1,3 +1,3 @@
-package org.jb.cce.uast
+package org.jb.cce.uast.exceptions
 
 class UnifiedAstException : Exception()

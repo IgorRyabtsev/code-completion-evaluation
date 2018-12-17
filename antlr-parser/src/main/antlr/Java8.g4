@@ -1098,7 +1098,7 @@ arrayAccess_lfno_primary
 	;
 
 methodInvocation
-	:	methodName '(' argumentList? ')'
+	:	Identifier '(' argumentList? ')'
 	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
 	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
 	|	primary '.' typeArguments? Identifier '(' argumentList? ')'
@@ -1111,7 +1111,7 @@ methodInvocation_lf_primary
 	;
 
 methodInvocation_lfno_primary
-	:	methodName '(' argumentList? ')'
+	:	Identifier '(' argumentList? ')'
 	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
 	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
 	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'

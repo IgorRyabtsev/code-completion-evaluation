@@ -1,9 +1,15 @@
 package org.jb.cce.uast
 
-class FileNode(val path: String) : UnifiedAstNode {
+import org.jb.cce.uast.statements.declarations.DeclarationNode
 
-    val classes = mutableListOf<ClassNode>()
-    val globalFunctionCalls = mutableListOf<FunctionCallNode>()
-    val globalVariableUsages = mutableListOf<VariableUsageNode>()
-    val functions = mutableListOf<FunctionNode>()
+class FileNode(offset: Int,
+               length: Int) : UnifiedAstNode(offset, length) {
+
+    private val declarations = mutableListOf<DeclarationNode>()
+
+    fun addDeclaration(declaration: DeclarationNode) {
+        declarations += declaration
+    }
+
+    override fun getChildren() = declarations
 }

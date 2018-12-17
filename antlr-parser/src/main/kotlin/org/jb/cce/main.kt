@@ -10,6 +10,6 @@ fun main(args: Array<String>) {
     }
     val lexer = Java8Lexer(CharStreams.fromFileName(args[0]))
     val parser = Java8Parser(BufferedTokenStream(lexer))
-    val tree = JavaVisitor().buildUnifiedAst(args[0], parser)
-    tree.accept()
+    val tree = JavaVisitor().buildUnifiedAst(parser)
+    tree
 }
