@@ -3,21 +3,29 @@ package org.jb.cce.actions
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FileTypeIndex
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.indexing.FileBasedIndex
+import com.intellij.psi.search.GlobalSearchScopes
 import org.antlr.v4.runtime.BufferedTokenStream
 import org.antlr.v4.runtime.CharStreams
-import org.jb.cce.actions.Action
-import org.jb.cce.actions.generateActions
+import org.jb.cce.Interpretator
+import org.jb.cce.Java8Lexer
+import org.jb.cce.Java8Parser
+import org.jb.cce.JavaVisitor
 import org.jb.cce.interpretator.CompletionInvokerImpl
+import org.jb.cce.metrics.FMeasureMetricsEvaluator
+import org.jb.cce.metrics.PrecisionMetricsEvaluator
+import org.jb.cce.metrics.RecallMetricsEvaluator
 import java.util.stream.Collectors
 
 class CaclucateCompletionForAllProjectFilesAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent?) {
-        val project = e?.project ?:return
-        val containingFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, JavaFileType.INSTANCE,
-                GlobalSearchScope.projectScope(project))
+        val project = e?.project ?: return
+        val containingFiles = getFiles(project, e)
+        containingFiles.forEach { println(it.canonicalPath) }
         val generatedActions = mutableListOf<List<Action>>()
         for (javaFile in containingFiles) {
             val lexer = Java8Lexer(CharStreams.fromFileName(javaFile.path))
@@ -31,9 +39,15 @@ class CaclucateCompletionForAllProjectFilesAction : AnAction() {
                 .flatMap { l -> l.stream() }
                 .collect(Collectors.toList())
         val completions = interpretator.interpret(actions)
-        println("Completion quality evaluation for all project")
+        println("Completion quality evaluation for project files in selected directory")
         println("Precision Metric value = " + PrecisionMetricsEvaluator.evaluate(completions))
         println("Recall Metric value = " + RecallMetricsEvaluator.evaluate(completions))
         println("FMeasure Metric value = " + FMeasureMetricsEvaluator.evaluate(completions))
+    }
+
+    private fun getFiles(project: Project, e: AnActionEvent): Collection<VirtualFile> {
+        val selectedFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return emptyList()
+        val psiDirectory = PsiManager.getInstance(project).findDirectory(selectedFile) ?: return listOf(selectedFile)
+        return FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScopes.directoryScope(psiDirectory, true))
     }
 }

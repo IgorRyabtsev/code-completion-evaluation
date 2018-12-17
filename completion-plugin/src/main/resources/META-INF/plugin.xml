@@ -26,8 +26,8 @@
         </action>
         <action id="org.jb.cce.actions.CaclucateCompletionForAllProjectFilesAction"
                 class="org.jb.cce.actions.CaclucateCompletionForAllProjectFilesAction"
-                text="Calculate metrics for all project"
-                description="Calculate completion quality over all project files">
+                text="Calculate Metrics For Selected Files"
+                description="Calculate completion quality over selected files">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
         </action>
     </actions>
