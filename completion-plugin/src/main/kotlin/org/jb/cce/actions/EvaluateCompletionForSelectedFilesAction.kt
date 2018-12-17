@@ -21,7 +21,7 @@ import org.jb.cce.metrics.PrecisionMetricsEvaluator
 import org.jb.cce.metrics.RecallMetricsEvaluator
 import java.util.stream.Collectors
 
-class CaclucateCompletionForAllProjectFilesAction : AnAction() {
+class EvaluateCompletionForSelectedFilesAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent?) {
         val project = e?.project ?: return
         val containingFiles = getFiles(project, e)
