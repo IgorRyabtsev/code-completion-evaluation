@@ -1,3 +1,5 @@
+package org.jb.cce.metrics
+
 import org.jb.cce.Session
 import java.util.stream.Collectors
 
