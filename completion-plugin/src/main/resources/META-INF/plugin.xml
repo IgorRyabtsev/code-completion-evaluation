@@ -20,11 +20,12 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="org.jb.cce.CalculateCompletionForSelectedFileAction" class="org.jb.cce.CalculateCompletionForSelectedFileAction" text="Calculate metrics"
+        <action id="org.jb.cce.actions.CalculateCompletionForSelectedFileAction" class="org.jb.cce.actions.CalculateCompletionForSelectedFileAction" text="Calculate metrics"
                 description="Calculate metrics">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
-        <action id="org.jb.cce.CaclucateCompletionForAllProjectFilesAction" class="org.jb.cce.CaclucateCompletionForAllProjectFilesAction"
+        <action id="org.jb.cce.actions.CaclucateCompletionForAllProjectFilesAction"
+                class="org.jb.cce.actions.CaclucateCompletionForAllProjectFilesAction"
                 text="Calculate metrics for all project"
                 description="Calculate completion quality over all project files">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
