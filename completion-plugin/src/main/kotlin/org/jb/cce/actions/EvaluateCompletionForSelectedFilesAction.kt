@@ -46,8 +46,12 @@ class EvaluateCompletionForSelectedFilesAction : AnAction() {
     }
 
     private fun getFiles(project: Project, e: AnActionEvent): Collection<VirtualFile> {
-        val selectedFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return emptyList()
-        val psiDirectory = PsiManager.getInstance(project).findDirectory(selectedFile) ?: return listOf(selectedFile)
-        return FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScopes.directoryScope(psiDirectory, true))
+        val selectedFiles = e.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY) ?: return emptyList()
+        fun files(file: VirtualFile): Collection<VirtualFile> {
+            val psiDirectory = PsiManager.getInstance(project).findDirectory(file) ?: return listOf(file)
+            return FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScopes.directoryScope(psiDirectory, true))
+        }
+
+        return selectedFiles.flatMap { files(it) }.distinct().toList()
     }
 }
