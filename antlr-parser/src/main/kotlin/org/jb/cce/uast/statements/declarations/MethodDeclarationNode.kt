@@ -18,5 +18,5 @@ class MethodDeclarationNode(offset: Int,
 
     override fun getName() = header.getName()
 
-    override fun getChildren() = header.getChildren() + (body?.getChildren() ?: listOf())
+    override fun getChildren() = listOf(header) + (body?.let { listOf(it) } ?: listOf())
 }

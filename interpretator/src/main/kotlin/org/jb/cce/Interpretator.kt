@@ -1,6 +1,12 @@
 package org.jb.cce
 
-import org.jb.cce.actions.*
+import org.jb.cce.actions.Action
+import org.jb.cce.actions.CallCompletion
+import org.jb.cce.actions.CancelSession
+import org.jb.cce.actions.MoveCaret
+import org.jb.cce.actions.PrintText
+import org.jb.cce.actions.DeleteRange
+import org.jb.cce.actions.OpenFile
 import org.jb.cce.exception.UnexpectedActionException
 
 

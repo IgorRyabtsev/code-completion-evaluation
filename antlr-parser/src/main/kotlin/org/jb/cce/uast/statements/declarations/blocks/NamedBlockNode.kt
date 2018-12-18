@@ -1,7 +1,6 @@
 package org.jb.cce.uast.statements.declarations.blocks
 
 import org.jb.cce.uast.statements.StatementNode
-import org.jb.cce.uast.statements.declarations.BlockNode
 
 class NamedBlockNode(private val name: String,
                      offset: Int,

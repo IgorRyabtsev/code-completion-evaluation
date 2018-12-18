@@ -1,50 +1,75 @@
 package org.jb.cce.actions
 
 import org.jb.cce.uast.*
-import java.util.*
+import org.jb.cce.uast.statements.declarations.blocks.BlockNode
+import org.jb.cce.uast.statements.declarations.blocks.ClassInitializerNode
+import org.jb.cce.uast.statements.declarations.blocks.GlobalNode
+import org.jb.cce.uast.statements.declarations.blocks.MethodBodyNode
 
-fun UnifiedAstNode.getAllRValues(list: MutableList<RValueNode> = mutableListOf()): List<RValueNode> {
-    when (this) {
-        is FileNode -> {
-            list += globalFunctionCalls + globalVariableUsages
-            (classes + globalFunctionCalls + functions).forEach {
-                it.getAllRValues(list)
-            }
-        }
-        is ClassNode -> {
-            list += initFunctionCalls + initVariableUsages
-            (subclasses + initFunctionCalls + methods).forEach {
-                it.getAllRValues(list)
-            }
-        }
-        is FunctionNode -> {
-            list += variableUsages + functionCalls
-            functionCalls.forEach {
-                it.getAllRValues(list)
-            }
-        }
-        is FunctionCallNode -> {
-            list += arguments
-            arguments.forEach {
-                it.getAllRValues(list)
-            }
-        }
+class DeleteMethodBodiesVisitor : UnifiedAstVisitor {
+
+    private val actions = mutableListOf<DeleteRange>()
+
+    fun getActions(): List<DeleteRange> = actions
+
+    override fun visitGlobalNode(node: GlobalNode) {
+        actions += DeleteRange(node.getOffset(), node.getOffset() + node.getLength())
     }
-    return list
+
+    override fun visitClassInitializerNode(node: ClassInitializerNode) {
+        actions += DeleteRange(node.getOffset(), node.getOffset() + node.getLength())
+    }
+
+    override fun visitMethodBodyNode(node: MethodBodyNode) {
+        actions += DeleteRange(node.getOffset(), node.getOffset() + node.getLength())
+    }
 }
 
-fun generateActions(tree: FileNode): List<Action> {
-    val list = mutableListOf<Action>(OpenFile(tree.path))
-    val rvalues = tree.getAllRValues()
-    Collections.sort(rvalues, Comparator.comparingInt { it.offset })
-    rvalues.asReversed().forEach {
-        list.add(DeleteRange(it.offset, it.offset + it.text.length))
+class CallCompletionsVisitor(private val text: String) : UnifiedAstVisitor {
+
+    private val actions = mutableListOf<Action>()
+    private var isInsideDeletedText = false
+    private var previousTextStart = 0
+
+    fun getActions(): List<Action> = actions
+
+    override fun visitClassInitializerNode(node: ClassInitializerNode) = visitDeletableBlock(node)
+
+    override fun visitGlobalNode(node: GlobalNode) = visitDeletableBlock(node)
+
+    override fun visitMethodBodyNode(node: MethodBodyNode) = visitDeletableBlock(node)
+
+    private fun visitDeletableBlock(node: BlockNode) {
+        if (isInsideDeletedText) return
+        isInsideDeletedText = true
+        previousTextStart = node.getOffset()
+        visitChildren(node)
+        isInsideDeletedText = false
+        if (previousTextStart < node.getOffset() + node.getLength()) {
+            actions += MoveCaret(previousTextStart)
+            actions += PrintText(text.substring(IntRange(previousTextStart, node.getOffset() + node.getLength() - 1)))
+        }
     }
-    rvalues.forEach { rvalue ->
-        list.add(MoveCaret(rvalue.offset))
-        list.add(CallCompletion(rvalue.text))
-        list.add(CancelSession())
-        list.add(PrintText(rvalue.text))
+
+    override fun visitCompletableNode(node: CompletableNode) {
+        if (previousTextStart < node.getOffset()) {
+            actions += MoveCaret(previousTextStart)
+            actions += PrintText(text.substring(IntRange(previousTextStart, node.getOffset() - 1)))
+            previousTextStart = node.getOffset() + node.getLength()
+        }
+        actions += CallCompletion(node.getText())
+        actions += CancelSession()
+        actions += PrintText(node.getText())
     }
-    return list
+}
+
+
+fun generateActions(fileText: String, tree: FileNode): List<Action> {
+
+    val deletionVisitor = DeleteMethodBodiesVisitor()
+    deletionVisitor.visit(tree)
+    val completionVisitor = CallCompletionsVisitor(fileText)
+    completionVisitor.visit(tree)
+
+    return deletionVisitor.getActions().reversed() + completionVisitor.getActions()
 }

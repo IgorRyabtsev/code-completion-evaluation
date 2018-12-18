@@ -24,9 +24,9 @@ class PrintCompletionAction : AnAction() {
         // generate actions
         val lexer = Java8Lexer(CharStreams.fromFileName(filePath))
         val parser = Java8Parser(BufferedTokenStream(lexer))
-        val tree = JavaVisitor().buildUnifiedAst(filePath, parser)
+        val tree = JavaVisitor().buildUnifiedAst(parser)
 
-        val generatedActions = generateActions(tree)
+        val generatedActions = generateActions(currentFile.path, tree)
         val completions = interpretator.interpret(generatedActions)
 
         println("Precision Metric value = " + PrecisionMetricsEvaluator.evaluate(completions))

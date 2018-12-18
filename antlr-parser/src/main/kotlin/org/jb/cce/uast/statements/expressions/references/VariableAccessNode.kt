@@ -1,8 +1,10 @@
 package org.jb.cce.uast.statements.expressions.references
 
-class VariableAccessNode(name: String,
-                         offset: Int,
-                         length: Int) : ReferenceNode(name, offset, length) {
+import org.jb.cce.uast.CompletableNode
 
-    override fun getChildren() = prefixReference?.let { listOf(it) } ?: listOf()
+class VariableAccessNode(private val name: CompletableNode,
+                         offset: Int,
+                         length: Int) : ReferenceNode(name.getText(), offset, length) {
+
+    override fun getChildren() = prefixReference?.let { listOf(it, name) } ?: listOf(name)
 }

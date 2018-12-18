@@ -12,5 +12,5 @@ class MethodHeaderNode(name: String,
         arguments += argument
     }
 
-    override fun getChildren(): List<UnifiedAstNode> = arguments.toList()
+    override fun getChildren() = arguments
 }

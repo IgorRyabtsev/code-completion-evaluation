@@ -1,11 +1,14 @@
 package org.jb.cce
 
 import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.tree.TerminalNode
 import org.jb.cce.uast.*
+import org.jb.cce.uast.statements.AssignmentNode
 import org.jb.cce.uast.statements.declarations.*
+import org.jb.cce.uast.statements.declarations.blocks.BlockNode
 import org.jb.cce.uast.statements.declarations.blocks.ClassInitializerNode
 import org.jb.cce.uast.statements.declarations.blocks.MethodBodyNode
-import org.jb.cce.uast.statements.expressions.references.FunctionCallNode
+import org.jb.cce.uast.statements.expressions.references.MethodCallNode
 import org.jb.cce.uast.statements.expressions.references.VariableAccessNode
 
 class JavaVisitor : Java8BaseVisitor<Unit>() {
@@ -35,6 +38,18 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
     }
 
     override fun visitNormalInterfaceDeclaration(ctx: Java8Parser.NormalInterfaceDeclarationContext) {
+        val parentNode = currentNode
+        currentNode = ClassDeclarationNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        visitChildren(ctx)
+        when (parentNode) {
+            is FileNode -> parentNode.addDeclaration(currentNode as ClassDeclarationNode)
+            is ClassDeclarationNode -> parentNode.addMember(currentNode as ClassDeclarationNode)
+            is BlockNode -> parentNode.addStatement(currentNode as ClassDeclarationNode)
+        }
+        currentNode = parentNode
+    }
+
+    override fun visitEnumDeclaration(ctx: Java8Parser.EnumDeclarationContext) {
         val parentNode = currentNode
         currentNode = ClassDeclarationNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
         visitChildren(ctx)
@@ -89,7 +104,7 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
         val parentNode = currentNode as ClassDeclarationNode
         currentNode = MethodDeclarationNode(getOffset(ctx), getLength(ctx))
         visitChildren(ctx)
-        parentNode.addMember(currentNode as ClassInitializerNode)
+        parentNode.addMember(currentNode as MethodDeclarationNode)
         currentNode = parentNode
     }
 
@@ -97,7 +112,7 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
         val parentNode = currentNode as ClassDeclarationNode
         currentNode = MethodDeclarationNode(getOffset(ctx), getLength(ctx))
         visitChildren(ctx)
-        parentNode.addMember(currentNode as ClassInitializerNode)
+        parentNode.addMember(currentNode as MethodDeclarationNode)
         currentNode = parentNode
     }
 
@@ -118,8 +133,9 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
     }
 
     override fun visitFormalParameter(ctx: Java8Parser.FormalParameterContext) {
+        val parentNode = currentNode as MethodHeaderNode
         val childNode = VariableDeclarationNode(ctx.variableDeclaratorId().Identifier().text, getOffset(ctx), getLength(ctx))
-        (currentNode as MethodHeaderNode).addArgument(childNode)
+        parentNode.addArgument(childNode)
     }
 
     override fun visitLastFormalParameter(ctx: Java8Parser.LastFormalParameterContext) {
@@ -127,8 +143,9 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
             visit(ctx.formalParameter())
             return
         }
+        val parentNode = currentNode as MethodHeaderNode
         val childNode = VariableDeclarationNode(ctx.variableDeclaratorId().Identifier().text, getOffset(ctx), getLength(ctx))
-        (currentNode as MethodHeaderNode).addArgument(childNode)
+        parentNode.addArgument(childNode)
     }
 
     override fun visitMethodBody(ctx: Java8Parser.MethodBodyContext) {
@@ -148,35 +165,49 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
     }
 
     override fun visitExpressionName(ctx: Java8Parser.ExpressionNameContext) {
-        val childNode = VariableAccessNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
-        (currentNode as BlockNode).addStatement(childNode)
+        val name = CompletableNode(ctx.Identifier().text, getOffset(ctx.Identifier()), getLength(ctx.Identifier()))
+        val parentNode = currentNode
+        val childNode = VariableAccessNode(name, getOffset(ctx), getLength(ctx))
+        when (parentNode) {
+            is BlockNode -> parentNode.addStatement(childNode)
+            is AssignmentNode -> parentNode.setAssigned(childNode)
+            is MethodCallNode -> parentNode.addArgument(childNode)
+        }
     }
 
     override fun visitFieldAccess(ctx: Java8Parser.FieldAccessContext) {
-        val childNode = VariableAccessNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
-        (currentNode as BlockNode).addStatement(childNode)
+        val name = CompletableNode(ctx.Identifier().text, getOffset(ctx.Identifier()), getLength(ctx.Identifier()))
+        val parentNode = currentNode
+        val childNode = VariableAccessNode(name, getOffset(ctx), getLength(ctx))
+        when (parentNode) {
+            is BlockNode -> parentNode.addStatement(childNode)
+            is AssignmentNode -> parentNode.setAssigned(childNode)
+            is MethodCallNode -> parentNode.addArgument(childNode)
+        }
     }
 
     override fun visitMethodInvocation(ctx: Java8Parser.MethodInvocationContext) {
         ctx.expressionName()?.let { visit(it) }
         ctx.primary()?.let { visit(it) }
         val parentNode = currentNode
-        currentNode = FunctionCallNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        val name = CompletableNode(ctx.Identifier().text, getOffset(ctx.Identifier()), getLength(ctx.Identifier()))
+        currentNode = MethodCallNode(name, getOffset(ctx), getLength(ctx))
         ctx.argumentList()?.let { visit(it) }
         when (parentNode) {
-            is BlockNode -> parentNode.addStatement(currentNode as FunctionCallNode)
-            is FunctionCallNode -> parentNode.addArgument(currentNode as FunctionCallNode)
+            is BlockNode -> parentNode.addStatement(currentNode as MethodCallNode)
+            is MethodCallNode -> parentNode.addArgument(currentNode as MethodCallNode)
         }
         currentNode = parentNode
     }
 
     override fun visitMethodInvocation_lf_primary(ctx: Java8Parser.MethodInvocation_lf_primaryContext) {
         val parentNode = currentNode
-        currentNode = FunctionCallNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        val name = CompletableNode(ctx.Identifier().text, getOffset(ctx.Identifier()), getLength(ctx.Identifier()))
+        currentNode = MethodCallNode(name, getOffset(ctx), getLength(ctx))
         ctx.argumentList()?.let { visit(it) }
         when (parentNode) {
-            is BlockNode -> parentNode.addStatement(currentNode as FunctionCallNode)
-            is FunctionCallNode -> parentNode.addArgument(currentNode as FunctionCallNode)
+            is BlockNode -> parentNode.addStatement(currentNode as MethodCallNode)
+            is MethodCallNode -> parentNode.addArgument(currentNode as MethodCallNode)
         }
         currentNode = parentNode
     }
@@ -184,16 +215,58 @@ class JavaVisitor : Java8BaseVisitor<Unit>() {
     override fun visitMethodInvocation_lfno_primary(ctx: Java8Parser.MethodInvocation_lfno_primaryContext) {
         ctx.expressionName()?.let { visit(it) }
         val parentNode = currentNode
-        currentNode = FunctionCallNode(ctx.Identifier().text, getOffset(ctx), getLength(ctx))
+        val name = CompletableNode(ctx.Identifier().text, getOffset(ctx.Identifier()), getLength(ctx.Identifier()))
+        currentNode = MethodCallNode(name, getOffset(ctx), getLength(ctx))
         ctx.argumentList()?.let { visit(it) }
         when (parentNode) {
-            is BlockNode -> parentNode.addStatement(currentNode as FunctionCallNode)
-            is FunctionCallNode -> parentNode.addArgument(currentNode as FunctionCallNode)
+            is BlockNode -> parentNode.addStatement(currentNode as MethodCallNode)
+            is MethodCallNode -> parentNode.addArgument(currentNode as MethodCallNode)
+        }
+        currentNode = parentNode
+    }
+
+    override fun visitClassInstanceCreationExpression(ctx: Java8Parser.ClassInstanceCreationExpressionContext) {
+        ctx.expressionName()?.let { visit(it) }
+        ctx.primary()?.let { visit(it) }
+        val parentNode = currentNode
+        val name = CompletableNode(ctx.Identifier().last().text, getOffset(ctx.Identifier().last()), getLength(ctx.Identifier().last()))
+        currentNode = MethodCallNode(name, getOffset(ctx), getLength(ctx))
+        ctx.argumentList()?.let { visit(it) }
+        when (parentNode) {
+            is BlockNode -> parentNode.addStatement(currentNode as MethodCallNode)
+            is MethodCallNode -> parentNode.addArgument(currentNode as MethodCallNode)
+        }
+        currentNode = parentNode
+    }
+
+    override fun visitClassInstanceCreationExpression_lf_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lf_primaryContext) {
+        val parentNode = currentNode
+        val name = CompletableNode(ctx.Identifier().text, getOffset(ctx.Identifier()), getLength(ctx.Identifier()))
+        currentNode = MethodCallNode(name, getOffset(ctx), getLength(ctx))
+        ctx.argumentList()?.let { visit(it) }
+        when (parentNode) {
+            is BlockNode -> parentNode.addStatement(currentNode as MethodCallNode)
+            is MethodCallNode -> parentNode.addArgument(currentNode as MethodCallNode)
+        }
+        currentNode = parentNode
+    }
+
+    override fun visitClassInstanceCreationExpression_lfno_primary(ctx: Java8Parser.ClassInstanceCreationExpression_lfno_primaryContext) {
+        ctx.expressionName()?.let { visit(it) }
+        val parentNode = currentNode
+        val name = CompletableNode(ctx.Identifier().last().text, getOffset(ctx.Identifier().last()), getLength(ctx.Identifier().last()))
+        currentNode = MethodCallNode(name, getOffset(ctx), getLength(ctx))
+        ctx.argumentList()?.let { visit(it) }
+        when (parentNode) {
+            is BlockNode -> parentNode.addStatement(currentNode as MethodCallNode)
+            is MethodCallNode -> parentNode.addArgument(currentNode as MethodCallNode)
         }
         currentNode = parentNode
     }
 
     private fun getOffset(ctx: ParserRuleContext) = ctx.start.startIndex
+    private fun getOffset(ctx: TerminalNode) = ctx.symbol.startIndex
 
     private fun getLength(ctx: ParserRuleContext) = ctx.stop.stopIndex - ctx.start.startIndex + 1
+    private fun getLength(ctx: TerminalNode) = ctx.symbol.stopIndex - ctx.symbol.startIndex + 1
 }

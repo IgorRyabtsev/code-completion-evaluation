@@ -6,5 +6,7 @@ abstract class UnifiedAstNode(private val offset: Int,
     fun getOffset() = offset
     fun getLength() = length
 
+    fun accept(visitor: UnifiedAstVisitor) = visitor.visit(this)
+
     abstract fun getChildren(): List<UnifiedAstNode>
 }
